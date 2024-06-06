@@ -18,12 +18,17 @@ def get_branch_name(directory):
   return current_branch
 
 def install_qt():
-  # qt
-  if not base.is_file("./qt_source_5.9.9.tar.xz"):
-    base.download("https://download.qt.io/new_archive/qt/5.9/5.9.9/single/qt-everywhere-opensource-src-5.9.9.tar.xz", "./qt_source_5.9.9.tar.xz")
+  # qt download is very slow, you can download it and mount to /work beforehand in case your build failed
+  if base.is_dir("/work/qt-everywhere-opensource-src-5.9.9"):
+    print("qt-dir is "+ os.getcwd())
+    if not base.is_dir("./qt-everywhere-opensource-src-5.9.9"):
+      base.cmd("ln", ["-s", "/work/qt-everywhere-opensource-src-5.9.9", "./qt-everywhere-opensource-src-5.9.9"])
+  else:  
+    if not base.is_file("./qt_source_5.9.9.tar.xz"):
+      base.download("https://download.qt.io/new_archive/qt/5.9/5.9.9/single/qt-everywhere-opensource-src-5.9.9.tar.xz", "./qt_source_5.9.9.tar.xz")
 
-  if not base.is_dir("./qt-everywhere-opensource-src-5.9.9"):
-    base.cmd("tar", ["-xf", "./qt_source_5.9.9.tar.xz"])
+    if not base.is_dir("./qt-everywhere-opensource-src-5.9.9"):
+      base.cmd("tar", ["-xf", "./qt_source_5.9.9.tar.xz"])
 
   qt_params = ["-opensource",
                "-confirm-license",

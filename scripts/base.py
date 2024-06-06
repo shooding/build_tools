@@ -13,6 +13,7 @@ import codecs
 import re
 import stat
 import json
+import time
 
 __file__script__path__ = os.path.dirname( os.path.realpath(__file__))
 
@@ -507,36 +508,47 @@ def git_update(repo, is_no_errors=False, is_current_dir=False, git_owner=""):
     folder = repo
   is_not_exit = False
   if not is_dir(folder):
-    retClone = cmd("git", ["clone", url, folder], is_no_errors)
+    retClone = retry_cmd("git", ["clone", url, folder], is_no_errors)
     if retClone != 0:
       return
     is_not_exit = True
   old_cur = os.getcwd()
   os.chdir(folder)
-  cmd("git", ["fetch"], False if ("1" != config.option("update-light")) else True)
+  retry_cmd("git", ["fetch"], False if ("1" != config.option("update-light")) else True)
   if is_not_exit or ("1" != config.option("update-light")):
-    retCheckout = cmd("git", ["checkout", "-f", config.option("branch")], True)
-    if (retCheckout != 0):
+    retCheckout = retry_cmd("git", ["checkout", "-f", config.option("branch")], True)
+    if retCheckout != 0:
       print("branch does not exist...")
       print("switching to master...")
       cmd("git", ["checkout", "-f", "master"])
     cmd("git", ["submodule", "update", "--init", "--recursive"], True)
   if (0 != config.option("branch").find("tags/")):
-    cmd("git", ["pull"], False if ("1" != config.option("update-light")) else True)
+    retry_cmd("git", ["pull"], False if ("1" != config.option("update-light")) else True)
     cmd("git", ["submodule", "update", "--recursive", "--remote"], True)
   os.chdir(old_cur)
   return
 
+def retry_cmd(prog, args, is_no_errors, retries=3, delay=5):
+  """Execute a command with retries."""
+  for attempt in range(retries):
+    ret = cmd(prog, args, is_no_errors)
+    if ret == 0:
+      return ret
+    else:
+      print("Command failed, attempt {}/{}. Retrying in {} seconds...".format(attempt + 1, retries, delay))
+      time.sleep(delay)
+  return ret
+
 def get_repositories():
   result = {}
-  result["core"] = [False, False]
-  result["sdkjs"] = [False, False]
+  # result["core"] = [False, False]
+  # result["sdkjs"] = [False, False]
   result.update(get_sdkjs_addons())
   result["onlyoffice.github.io"] = [False, False]
-  result["web-apps"] = [False, False]
+  # result["web-apps"] = [False, False]
   result.update(get_web_apps_addons())
-  result["dictionaries"] = [False, False]
-  result["core-fonts"] = [False, False]
+  # result["dictionaries"] = [False, False]
+  # result["core-fonts"] = [False, False]
 
   if config.check_option("module", "builder"):
     result["document-templates"] = [False, False]
@@ -608,7 +620,7 @@ def update_repositories(repositories):
       git_update(repo, value[0], False)
     else:
       if is_dir(current_dir + "/.git"):
-        delete_dir_with_access_error(current_dir);
+        delete_dir_with_access_error(current_dir)
         delete_dir(current_dir)
       if not is_dir(current_dir):
         create_dir(current_dir)
