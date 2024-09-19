@@ -28,7 +28,7 @@ sudo apt-get install -y python
 1. Clone the build_tools repository:
 
     ```bash
-    git clone https://github.com/ONLYOFFICE/build_tools.git
+    git clone -b develop-interactive-resumable-builder https://github.com/shooding/build_tools.git    
     ```
 
 2. Go to the `build_tools/tools/linux` directory:
@@ -40,7 +40,7 @@ sudo apt-get install -y python
 3. Run the `automate.py` script:
 
     ```bash
-    ./automate.py
+    ./automate.py server
     ```
 
 If you run the script without any parameters this allows to build **ONLYOFFICE
