@@ -36,5 +36,9 @@ RUN rm /usr/bin/python && ln -s /usr/bin/python2 /usr/bin/python
 VOLUME ["/work"]
 WORKDIR /work
 
+# To avoid npm run as non-root when building submodules server/(DocService, Metrics, FileConverter)
+# causing EACCES of /root/.npm/_logs or dynamically created .log (644)
+ENV npm_config_cache=/work/.npm
+
 # Set the default command
 CMD ["bash"]
