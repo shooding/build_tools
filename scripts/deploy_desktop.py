@@ -66,9 +66,10 @@ def make():
     base.copy_lib(build_libraries_path, root_dir + "/converter", "DjVuFile")
     base.copy_lib(build_libraries_path, root_dir + "/converter", "XpsFile")
     base.copy_lib(build_libraries_path, root_dir + "/converter", "HtmlFile2")
-    base.copy_lib(build_libraries_path, root_dir + "/converter", "HtmlRenderer")
     base.copy_lib(build_libraries_path, root_dir + "/converter", "Fb2File")
     base.copy_lib(build_libraries_path, root_dir + "/converter", "EpubFile")
+    base.copy_lib(build_libraries_path, root_dir + "/converter", "IWorkFile")
+    base.copy_lib(build_libraries_path, root_dir + "/converter", "HWPFile")
     base.copy_lib(build_libraries_path, root_dir + "/converter", "DocxRenderer")
     
     if ("ios" == platform):
@@ -102,6 +103,7 @@ def make():
 
     base.generate_doctrenderer_config(root_dir + "/converter/DoctRenderer.config", "../editors/", "desktop", "", "../dictionaries")
     base.copy_dir(git_dir + "/document-templates/new", root_dir + "/converter/empty")
+    base.copy_dir(git_dir + "/desktop-apps/common/templates", root_dir + "/converter/templates")
 
     # dictionaries
     base.copy_dictionaries(git_dir + "/dictionaries", root_dir + "/dictionaries")
@@ -182,6 +184,7 @@ def make():
         base.copy_file(git_dir + "/desktop-apps/win-linux/extras/projicons/" + apps_postfix + "/projicons.exe", root_dir + "/DesktopEditors.exe")
         if not isWindowsXP:
           base.copy_file(git_dir + "/desktop-apps/win-linux/extras/update-daemon/" + apps_postfix + "/updatesvc.exe", root_dir + "/updatesvc.exe")
+          base.copy_file(git_dir + "/desktop-apps/win-linux/extras/online-installer/" + apps_postfix + "/online-installer.exe", root_dir + "/online-installer.exe")
         base.copy_file(git_dir + "/desktop-apps/win-linux/" + apps_postfix + "/DesktopEditors.exe", root_dir + "/editors.exe")
         base.copy_file(git_dir + "/desktop-apps/win-linux/res/icons/desktopeditors.ico", root_dir + "/app.ico")
       elif (0 == platform.find("linux")):
@@ -257,6 +260,8 @@ def make():
 
     if isUseJSC:
       base.delete_file(root_dir + "/converter/icudtl.dat")
+
+    base.create_x2t_js_cache(root_dir + "/converter", "desktop", platform)
 
     if (0 == platform.find("win")):
       base.delete_file(root_dir + "/cef_sandbox.lib")

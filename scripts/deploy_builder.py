@@ -40,9 +40,10 @@ def make():
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "DjVuFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "XpsFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "HtmlFile2")
-    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "HtmlRenderer")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "Fb2File")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "EpubFile")
+    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "IWorkFile")
+    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "HWPFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "DocxRenderer")
     base.copy_file(git_dir + "/sdkjs/pdf/src/engine/cmap.bin", root_dir + "/cmap.bin")
 
@@ -76,9 +77,12 @@ def make():
       if (0 == platform.find("win")):
         base.copy_file(core_build_dir + "/lib/" + platform_postfix + "/doctrenderer.lib", root_dir + "/doctrenderer.lib")
     base.copy_v8_files(core_dir, root_dir, platform, isWindowsXP)
+    # python wrapper
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "docbuilder.c")
-
     base.copy_file(core_dir + "/DesktopEditor/doctrenderer/docbuilder.python/src/docbuilder.py", root_dir + "/docbuilder.py")
+    # java wrapper
+    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, root_dir, "docbuilder.jni")
+    base.copy_file(core_dir + "/DesktopEditor/doctrenderer/docbuilder.java/build/libs/docbuilder.jar", root_dir + "/docbuilder.jar")
 
     # app
     base.copy_exe(core_build_dir + "/bin/" + platform_postfix, root_dir, "docbuilder")
@@ -120,6 +124,25 @@ def make():
     if (0 == platform.find("mac")):
       base.mac_correct_rpath_x2t(root_dir)
       base.mac_correct_rpath_docbuilder(root_dir)
+
+    base.create_x2t_js_cache(root_dir, "builder", platform)
   
+    # delete unnecessary builder files
+    def delete_files(files):
+      for file in files:
+        base.delete_file(file)
+    
+    delete_files(base.find_files(root_dir, "*.wasm"))
+    delete_files(base.find_files(root_dir, "*_ie.js"))
+    base.delete_file(root_dir + "/sdkjs/pdf/src/engine/cmap.bin")
+    if 0 != platform.find("mac"):
+      delete_files(base.find_files(root_dir, "sdk-all.js"))
+      delete_files(base.find_files(root_dir, "sdk-all-min.js"))
+    base.delete_dir(root_dir + "/sdkjs/slide/themes")
+    base.delete_dir(root_dir + "/sdkjs/cell/css")
+    base.delete_file(root_dir + "/sdkjs/pdf/src/engine/viewer.js")
+    base.delete_file(root_dir + "/sdkjs/common/spell/spell/spell.js.mem")
+    base.delete_dir(root_dir + "/sdkjs/common/Images")   
+
   return
 

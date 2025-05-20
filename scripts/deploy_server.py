@@ -78,10 +78,11 @@ def make():
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "DjVuFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "XpsFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "HtmlFile2")
-    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "HtmlRenderer")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "doctrenderer")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "Fb2File")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "EpubFile")
+    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "IWorkFile")
+    base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "HWPFile")
     base.copy_lib(core_build_dir + "/lib/" + platform_postfix, converter_dir, "DocxRenderer")
     base.copy_file(git_dir + "/sdkjs/pdf/src/engine/cmap.bin", converter_dir + "/cmap.bin")
     base.copy_exe(core_build_dir + "/bin/" + platform_postfix, converter_dir, "x2t")
@@ -117,6 +118,8 @@ def make():
     for file in glob.glob(js_dir + "/web-apps/apps/*/*/*.js.map") \
               + glob.glob(js_dir + "/web-apps/apps/*/mobile/dist/js/*.js.map"):
       base.delete_file(file)
+
+    base.create_x2t_js_cache(converter_dir, "server", platform)
 
     # add embed worker code
     base.cmd_in_dir(git_dir + "/sdkjs/common/embed", "python", ["make.py", js_dir + "/web-apps/apps/api/documents/api.js"])
