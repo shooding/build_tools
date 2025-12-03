@@ -1,4 +1,4 @@
-FROM onlyoffice/documentserver:latest
+FROM onlyoffice/documentserver:8.1.3
 RUN apt-get update -y && \ 
 	apt-get install git -y \
 			python3 -y \
