@@ -506,25 +506,49 @@ def git_update(repo, is_no_errors=False, is_current_dir=False, git_owner=""):
   folder = get_script_dir() + "/../../" + repo
   if is_current_dir:
     folder = repo
-  is_not_exit = False
-  if not is_dir(folder):
+
+  # If folder exists and is not empty, never touch it.
+  if is_dir(folder) and len(os.listdir(folder)) > 0:
+    print("[git] skip update because folder exists and is not empty: " + folder)
+    return
+
+  # Folder does not exist or is empty: allow script to manage it.
+  is_not_exist = False
+  if (not is_dir(folder)) or (is_dir(folder) and len(os.listdir(folder)) == 0):
     retClone = retry_cmd("git", ["clone", url, folder], is_no_errors)
     if retClone != 0:
       return
-    is_not_exit = True
+    is_not_exist = True
+
   old_cur = os.getcwd()
   os.chdir(folder)
-  retry_cmd("git", ["fetch"], False if ("1" != config.option("update-light")) else True)
-  if is_not_exit or ("1" != config.option("update-light")):
-    retCheckout = retry_cmd("git", ["checkout", "-f", config.option("branch")], True)
+
+  retry_cmd(
+    "git",
+    ["fetch"],
+    False if ("1" != config.option("update-light")) else True
+  )
+
+  if is_not_exist or ("1" != config.option("update-light")):
+    retCheckout = retry_cmd(
+      "git",
+      ["checkout", "-f", config.option("branch")],
+      True
+    )
     if retCheckout != 0:
       print("branch does not exist...")
       print("switching to master...")
       cmd("git", ["checkout", "-f", "master"])
     cmd("git", ["submodule", "update", "--init", "--recursive"], True)
+
   if (0 != config.option("branch").find("tags/")):
-    retry_cmd("git", ["pull"], False if ("1" != config.option("update-light")) else True)
+    retry_cmd(
+      "git",
+      ["pull"],
+      False if ("1" != config.option("update-light")) else True
+    )
     cmd("git", ["submodule", "update", "--recursive", "--remote"], True)
+
   os.chdir(old_cur)
   return
 
